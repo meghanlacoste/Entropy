@@ -2,166 +2,245 @@
 
 package com.company;
 
+
+import java.util.*;
+import java.io.*;
 import static com.company.ProjConstants.*;
+public class Main {
 
-/**
- * Created by 13549lac on 13/11/2018.
- */
-
-
-public class Entropy {
-
-    // Declare/ Initialize Class variables:
-
-     private int numMsgs = INVALID_MSGS;
-    private int maxBits =  INVALID_BITS;
-    private int  totalFreq = 0;
-    private double msgProb =  INVALID;
-    private double entropy = INVALID;
-    private int  msgBits = INVALID;
-    private int  msgEncode = INVALID;
+    public static void main(String[] args) {
+	// write your code here
 
 
-    //    The number of messages is equal to the highest index number
-    //   Starting at MAX_DATA  loop backwards
-    //   If the value at the index position does not equal "INVALID"
-    //
-    //  Break;
-    // The index position of that value is the number of messages in the file.
+     // Creates an object from Entropy Class
+    Entropy calcE = new Entropy();
 
 
+    //Creates new 2d array:
+       // Column [n][0] represents the unique message.
+       // Column [n][1] represents the frequency of the message
+       // Column [n][2] represents probability of message
+       // Column [n][3] represents the number of bits required for the message
+       // Column [n][4] represents the message identifying number
 
-    public int calcTotalFreq(String array[][]){
+        String arr_[][] = new String [MAX_DATA][3];
 
-        for (int i=0; i < MAX_DATA; i++) {
-            if (array[i][1] != "INVALID") {
-                int freq = Integer.parseInt(array[i][1]);
-                totalFreq += freq;
 
+        // Initialize the array to a known value
+        // - loops over each row using "i", and columns using "j"
+        // -  sets all array values to INVALID
+
+        for(int i=0; i < MAX_DATA; i++) {
+            for(int j = 0; j < 2; j++){
+                arr_[i][j] = "INVALID";
             }
         }
 
-        return totalFreq;
-    }
+
+        // DECLARE VARIABLES
+
+        Boolean replicatedWord=false;
+        int totalFreq=INVALID;
+        String MsgProb;
+        int maxBits = INVALID;
+        double entropy = INVALID;
+        Boolean encodeFile = false;
+        String encodeFileName =  "user_msg_filename.txt ";
+        Boolean decodeFile = false;
+        String decodeFileName;
+        Boolean messageFile = false;
+        Boolean noFiles = false;
+        Boolean validWord = false;
+        Boolean fileDone=false;
+        try {
+            // --------------------------------
+            // create file, and scanner objects
+            // - file object is called tempfilenums.txt and is in your project directory
+            //   that is the same folder as the iml file
+            //
+
+            File userFile = new File(encodeFileName);
+            Scanner scanUserFile = new Scanner(userFile);
+
+            // ---------------------------------------------
+            // Reads in values from the file in a for loop
+            //
+
+            for(int i = 0; i < MAX_DATA; i++) {
+
+
+                // sets boolean back to false at the start of each repetition
+                replicatedWord = false;
+
+                // --------------------------------------------------
+                // The scanner checks if there is another string
+                //
+
+                if (scanUserFile.hasNext()) {
+
+                    // converts string to lower case
+
+                    String fileWord =  scanUserFile.next().toLowerCase();
+
+
+                    // starting at the current index position 'i', loops backwards over previously stored
+                    // strings in the array and checks if the file word is equal to any of the previous values
+
+                    for (int index = i; index >= 0; index --) {
+
+                        if (fileWord.equalsIgnoreCase(arr_[index][0])) {
+
+                            // calls upon method to get and return new frequency (adds one to the frequency)
+
+
+                            // converts string stored in array to integer
+                            int frequency = Integer.parseInt(arr_[index][1]);
+
+                            // adds one to the frequency
+                            frequency  += 1 ;
+
+                            // converts the new frequency back to a string and stores it back into the array
+                            arr_ [index][1] = Integer.toString(frequency);
+
+                            replicatedWord = true;
+
+                        }
+
+                    }
+
+                    // ---------------------------------------
+                    //
+                    //  pre-conditions:
+                    //      - the word is unique
+
+                    if (!replicatedWord) {
+
+                        // stores the word from the file in the next position of the array
+
+                       for (int i2=0; i2< MAX_DATA; i2++){
+                           if (arr_[i2][0].equals("INVALID")){
+
+                               arr_ [i2][0] = fileWord;
+
+                               // the value of 1 will be converted into a string type so that it can be stored in
+                               // the second colomn of the array.
+                               arr_ [i2][1] = Integer.toString(1);
+                               break;
+                           }
+                       }
+
+                    }// end for-loop
 
 
 
-    public int numMsgs (String array [][]) {
-        if (totalFreq != 0) {
-            numMsgs = 0;
-            for (int i = 0; i < MAX_DATA; i++) {
-                if (array[i][0] != "INVALID") {
-                    numMsgs += 1;
+                }// end if scanner has next
+
+                else {
+                    // ---------------------------------------------
+                    // The scanner detected no other integers
+                    // - sets boolean "fileDone" to true
+                    // - closes the scanner
+                    // - breaks out of the for loop
+                    //
+
+                    fileDone = true;
+                    scanUserFile.close();
+                    break;
                 }
+            }
 
+            // ---------------------------------------------
+            // The file has been completely read into the array, so the user is notified.
+            //
+
+            System.out.println();
+            if (fileDone) {
+                System.out.println("\n\tFile data has been read into array\n");
 
             }
+
+            // ---------------------------------------------
+            // If there is not enough space in the array so make sure the user is notified that the file contains
+            // more data than the array can hold.
+            //
+
+            if (!fileDone) {
+                System.out.println("\n\tCAUTION: file has additional data, consider making array larger.\n");
+            }
+
+
+            // ---------------------------------------------
+            // If the file cannot be found then an exception (error) is generated (thrown) that we have to
+            // deal with (catch).
+            // - we print "e" the exception, and
+            // - show the user where it was using the "exceptions" stack trace information
+            //
+
+            System.out.println();
+            for (int i = 0; i < MAX_DATA; i++) {
+                if (arr_[i][0] != "INVALID")
+                    System.out.println(arr_[i][0] + " index " + i + " freq: " + arr_[i][1]);
+            }
+
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e);
+            e.printStackTrace();
         }
-
-        return numMsgs;
-    }
-
-
-
-
-    public int calcMaxBits (){
-      double  double_maxBits = 0 ;
-        double_maxBits =(Math.log(numMsgs)) / Math.log(2);
-
-        // rounds up always to nearest integer and
-        maxBits = (int)Math.ceil(double_maxBits);
-
-        return maxBits;
-
-    }
-
-    public double calcMsgProb (String MsgFreq) {
-
-        if(totalFreq!=0) {
-
-            msgProb = ((Integer.parseInt(MsgFreq))/totalFreq );
-
-
-        } else {
-            msgProb = INVALID;
-        }
-
-
-        return msgProb;
-    }
-
-
-
-
-    public int calcMsgBits(String string_msgProb) {
-
-       double msgProb =  Double.parseDouble(string_msgProb);
-        double double_msgBits = - ((Math.log(msgProb)) / Math.log(2));
-        msgBits = (int)Math.ceil(double_msgBits);
-
-        return msgBits;
-    }
-
-
 
 
 
 /*
+  for (int i=0; i < MAX_DATA; i++){
+           if (arr_ [i][1] != "INVALID") {
+               calcE.calcTotalFreq(arr_ [i][1]);
 
+           }
 
-
-
-
-//takes an String parameter for the messages and calculates number of bits required to //encode the message
-+ calcMsgBits(string msg, msgProb)
-msgBits = - log2  msgProb
-
-
-//returns an integer that represents the number of bits that could be required to encode the messages, or INVALID_BITS
-+getMsgBits
-Return msgBits
-
-
-+ calcMsgProb (int totalFreq, String msgFreq)
-that returns a double precision value, for the message parameter that it was given (a String), or INVALID
-Int msgFreq = Parse string array [][x] to int
- msgProb= msgFreq divided by totalFreq
-
-+ getMsgProb
-Return msgProb
-
-
-- if there were 2 values Word1 and Word2 the entropy would be calculated by Entropy = -[ probWord (log2 probWord) +  probWord2 (log2 probWord2) ]
-Preconditions:
- 	- checks that there is more than zero message items.
-
-+calcEntropy  that returns a double precision value representing the entropy, or INVALID
-Loop through all all msgs and the corresponding msgBits.
-Entropy +=  (msgProb x msgBits)
-End loop
-
-+getEntropy
-Returns entropy
-
-
-+ encodeMsg(string prevNumb) that returns an integer value that represents the message number for the String parameter that it was given. Recall that the most frequently used messages should be the lowest message numbers i.e. sort the messages by frequency before and assigning message numbers
-
-Parse string prevNumb into int
-msgNumb =  prevNumb + 1
-
-+getEncodeMsg
- Returns msgNumb
-
-
-+ decodeMsg that returns a String that represents the message number that it was given. Recall that the most frequently used messages should be the lowest message numbers i.e. sort the messages by frequency before and assigning message numbers
-
-
-
-
+        }
  */
 
+        System.out.println("Total Freq: " + calcE.calcTotalFreq(arr_));
+
+        System.out.println("Number of messages: " + calcE.numMsgs(arr_));
+
+        System.out.println("MaxBits: " + calcE.calcMaxBits());
+
+        for (int i = 0; i < MAX_DATA; i++) {
+            if (arr_[i][1] != "INVALID") {
+
+                System.out.println(arr_[i][1]);
+
+                calcE.calcMsgProb(arr_[i][1]);
+
+
+                arr_[i][2] =  Double.toString( calcE.calcMsgProb(arr_[i][1]));
+
+                System.out.print("****" + calcE.calcMsgProb(arr_[i][1]));
+                System.out.println(" Message Probability: " + arr_[i][2]);
+
+                System.out.println("Message Bits: " + calcE.calcMsgBits(arr_[i][2]));
+
+
+            }
+        }
 
 
 
 
-}// end Entropy Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }// end main method
+}// end main class
