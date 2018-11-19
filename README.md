@@ -178,15 +178,6 @@ public class Main {
 
 
 
-
-
-            System.out.println();
-            for (int i = 0; i < MAX_DATA; i++) {
-                if (arr_[i][0] != "INVALID")
-                    System.out.println(arr_[i][0] + " index " + i + " freq: " + arr_[i][1]);
-            }
-
-
         } catch (FileNotFoundException e) {
             System.out.println(e);
             e.printStackTrace();
@@ -195,16 +186,15 @@ public class Main {
 
 
         //------------------------------------------------------------------------
-         calcE.calcTotalFreq(arr_);
+        calcE.calcTotalFreq(arr_);
 
-         calcE.numMsgs(arr_);
+        calcE.numMsgs(arr_);
 
-         calcE.calcMaxBits();
+        calcE.calcMaxBits();
 
         for (int i = 0; i < MAX_DATA; i++) {
             if (arr_[i][1] != "INVALID") {
 
-                System.out.println(arr_[i][1]);
 
                 calcE.calcMsgProb(arr_[i][1]);
 
@@ -212,9 +202,6 @@ public class Main {
                 arr_[i][2] =  Double.toString( calcE.calcMsgProb(arr_[i][1]));
 
 
-                System.out.println(" Message Probability: " + arr_[i][2]);
-
-                System.out.println("Message Bits: " + calcE.calcMsgBits(arr_[i][2]));
 
                 arr_[i][3] = Integer.toString(calcE.calcMsgBits(arr_[i][2]));
 
@@ -225,6 +212,112 @@ public class Main {
 
 
         calcE.tempArray(arr_);
+
+
+        for (int i=0; i< MAX_DATA; i++){
+
+            if (arr_[i][0]!= "INVALID") {
+
+                arr_[i][4] = Integer.toString(calcE.encodeMsg(i));
+
+            }
+
+        }
+
+        // Display the sorted Matrix
+        for (int i = 0; i < MAX_DATA; i++) {
+            if (arr_[i][0]!= "INVALID") {
+              //  System.out.println(arr_[i][0] + " " +arr_[i][1]  + " " + arr_[i][2] + " " + arr_[i][3] + " " +  arr_[i][4]  );
+
+            }
+
+        }
+
+
+
+
+
+
+        // <user_msg_filename>.txt
+
+
+        //  <user_msg_filename>_out.txt
+
+        System.out.println("==========================================================================================");
+        System.out.println("                       Data Result File \n");
+
+        System.out.println("\tData File:............\t\t\t " + encodeFileName );
+        System.out.printf("\tNumber of Messages:....\t%10s\n" , Integer.toString(calcE.numMsgs(arr_)));
+        System.out.printf("\tMax Number of Bits.....\t%10s\n" , Integer.toString(calcE.calcMaxBits()));
+        System.out.printf("\tEntropy:...............\t%13.2f\n", calcE.calcEntropy(arr_));
+        System.out.println("\n            Message          Frequency         # of bits       Probability ");
+        System.out.println("           ------------------------------------------------------------------\n");
+
+        for (int i=0; i< MAX_DATA; i ++){
+            if (arr_[i][0]!="INVALID") {
+                System.out.printf("\t\t %10s      %10s      %10s         %10.2f\n", arr_[i][0], arr_[i][1],arr_[i][3], Double.parseDouble(arr_[i][2]));
+
+            }
+        }
+
+        System.out.println("\n           ------------------------------------------------------------------\n");
+        System.out.println("\n==========================================================================================\n");
+
+        /*
+        You must display the required data to screen, and also write it into a file as well (name the file <user_msg_filename>_out.txt
+
+
+
+
+...
+========================================
+Data File: <user_msg_filename>.txt
+Data Result File: <user_msg_filename>_out.txt
+
+------------------------------
+Number of Messages: <some integer value>
+Max Number of Bits: <some integer value>
+Entropy: <some decimal value showing only 2 decimal places>
+
+Message	Frequency	# of bits	Probability
+------------	--------------	----------	--------------
+<msg 1>	<int>		<int>		<double with 2 decimal places>
+<msg 2>	<int>		<int>		<double with 2 decimal places>
+…
+<msg N>	<int>		<int>		<double with 2 decimal places>
+
+------------------------------
+Please enter the name of the message data file to be encoded:
+<msg_data>.txt
+** the above is to be done by the encode object and stored in the <msg_data>_EC.txt**
+Message Data Encoded into: <msg_data>_EC.txt
+
+Decoding <msg_data>_EC.txt into <msg_data>_DC.txt
+** the above is to be done by the decode object and stored in the <msg_data>_DC.txt**
+Display File Data: 
+
+Original Data		Encoded Data		Decoded Data
+-----------------		-------------------		--------------------
+<msg_data>		<msg_data>_EC	<msg_data>_DC
+<msg_data>		<msg_data>_EC	<msg_data>_DC
+<msg_data>		<msg_data>_EC	<msg_data>_DC
+…
+<msg_data>		<msg_data>_EC	<msg_data>_DC
+** the above is to be done reading all 3 files line by line simultaneously and displaying the values to the screen. This should be done using the displayFinalData method in the main class**
+========================================
+
+         */
+
+
+
+
+
+
+
+
+    }// end main method
+}// end main class
+
 
 
         for (int i=0; i< MAX_DATA; i++){
