@@ -23,6 +23,8 @@ public class Entropy {
     private int  msgBits = INVALID;
     private int  msgEncode = 0;
     private int  temp_int_arr [][] = new int [MAX_DATA][3];
+    private String decodeMsg = "INVALID_DECODE";
+
 
 
     // Function to sort by column
@@ -89,14 +91,17 @@ public class Entropy {
 
     //
     public int calcMaxBits (){
-        double  double_maxBits = 0 ;
-        double_maxBits =(Math.log(numMsgs)) / Math.log(2);
 
-        // rounds up always to nearest integer and
-        maxBits = (int)Math.ceil(double_maxBits);
+        if (numMsgs != INVALID_MSGS ) {
+            double double_maxBits = 0;
+            double_maxBits = (Math.log(numMsgs)) / Math.log(2);
 
-        return maxBits;
+            // rounds up always to nearest integer
+            maxBits = (int) Math.ceil(double_maxBits);
 
+        }
+
+            return maxBits;
     }
 
 
@@ -166,21 +171,18 @@ public class Entropy {
 
 
 
-            for (int i = 0; i < MAX_DATA; i++) {
+        for (int i = 0; i < MAX_DATA; i++) {
 
 
-                if (temp_int_arr[i][0] != INVALID) {
+            if (temp_int_arr[i][0] != INVALID) {
 
-                    temp_int_arr[i][2] = i;
-
-                }
+                temp_int_arr[i][2] = i;
 
             }
 
         }
 
-
-
+    }
 
 
 
@@ -198,44 +200,46 @@ public class Entropy {
         return msgEncode;
     }
 
+    public String decodeMsg (String arr_[][] , int encodeNumb) {
+
+        for (int i = 0; i < MAX_DATA; i++) {
+            if ( temp_int_arr [i][2] == encodeNumb){
+
+                decodeMsg = arr_[temp_int_arr[i][0]][0];
+            }
+        }
+
+        return decodeMsg;
+    }
 
 
 
 
-/*
+    public double calcEntropy (String arr_ [][]) {
+        double message_prob = 0;
+        int message_bits = 0;
+
+        for (int i = 0; i < MAX_DATA; i++) {
+
+            if (arr_[i][0] != "INVALID"){
+
+                message_prob= Double.parseDouble(arr_[i][2]);
+
+                message_bits = Integer.parseInt(arr_[i][3]);
+
+                 entropy += (message_prob * message_bits);
+            }
+
+        }
 
 
 
+        return entropy;
+    }
 
-
-- if there were 2 values Word1 and Word2 the entropy would be calculated by Entropy = -[ probWord (log2 probWord) +  probWord2 (log2 probWord2) ]
-Preconditions:
- 	- checks that there is more than zero message items.
-
-+calcEntropy  that returns a double precision value representing the entropy, or INVALID
-Loop through all all msgs and the corresponding msgBits.
-Entropy +=  (msgProb x msgBits)
-End loop
-
-+getEntropy
-Returns entropy
-
-
-+ encodeMsg(string prevNumb) that returns an integer value that represents the message number for the String parameter that it was given. Recall that the most frequently used messages should be the lowest message numbers i.e. sort the messages by frequency before and assigning message numbers
-
-Parse string prevNumb into int
-msgNumb =  prevNumb + 1
-
-+getEncodeMsg
- Returns msgNumb
-
-
-+ decodeMsg that returns a String that represents the message number that it was given. Recall that the most frequently used messages should be the lowest message numbers i.e. sort the messages by frequency before and assigning message numbers
-
-
-
-
- */
+    // Loop through all all msgs and the corresponding msgBits.
+   ///         Entropy +=  (msgProb x msgBits)
+  ///  End loop
 
 
 
