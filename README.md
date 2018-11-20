@@ -1,5 +1,6 @@
 # Entropy
 
+
 package com.company;
 
 import java.util.*;
@@ -24,6 +25,27 @@ public class Entropy {
     private int  msgEncode = 0;
     private int  temp_int_arr [][] = new int [MAX_DATA][3];
     private String decodeMsg = "INVALID_DECODE";
+
+
+    public  Entropy (int x){
+
+        //case statement
+
+        if (x == ENCODE){
+
+
+
+
+
+
+        } else if (x==DECODE){
+
+
+        }
+
+
+    }
+
 
 
 
@@ -238,7 +260,7 @@ public class Entropy {
         return entropy;
     }
 
-   
+
 
 
 
