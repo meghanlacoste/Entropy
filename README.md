@@ -101,7 +101,7 @@ public class Entropy {
 
         }
 
-            return maxBits;
+        return maxBits;
     }
 
 
@@ -216,6 +216,7 @@ public class Entropy {
 
 
     public double calcEntropy (String arr_ [][]) {
+        entropy=0;
         double message_prob = 0;
         int message_bits = 0;
 
@@ -227,7 +228,7 @@ public class Entropy {
 
                 message_bits = Integer.parseInt(arr_[i][3]);
 
-                 entropy += (message_prob * message_bits);
+                entropy += (message_prob * message_bits);
             }
 
         }
@@ -237,10 +238,7 @@ public class Entropy {
         return entropy;
     }
 
-    // Loop through all all msgs and the corresponding msgBits.
-   ///         Entropy +=  (msgProb x msgBits)
-  ///  End loop
-
+   
 
 
 
