@@ -18,7 +18,9 @@ public class Main {
 
 
         // Creates an object from Entropy Class
-        Entropy calcE = new Entropy();
+        Entropy calcE = new Entropy(0);
+        Entropy Encode = new Entropy(ENCODE);
+        Entropy Decode = new Entropy(DECODE);
 
 
         //Creates new 2d array:
@@ -53,6 +55,9 @@ public class Main {
         String user_msg_filename = "user_msg_filename.txt";
         String user_msg_filename_out;
         String outString;
+        String userInputFileName;
+        String userOutputFileName;
+        String fileString;
 
 
         Boolean fileDone = false;
@@ -319,5 +324,155 @@ public class Main {
 
 
 
-    }// end main method
+        //============================================================================================================================
+        //
+        System.out.println("\nEnter the name of the file you would like to encode");
+
+
+        // -------------------------------
+        //
+
+        Scanner scanSystemIn = new Scanner(System.in, "UTF-8");
+
+        // --------------------------------
+        // Use the Scanner "userFileName" to get the "next" input from "System.in"
+        //
+
+        userInputFileName = scanSystemIn.next();
+
+        // --------------------------------
+        // Display the user input now stored in "userInput"
+        //
+
+        System.out.println("\nThe user input: " + userInputFileName);
+
+        // ---------------------------------------------
+        // This is where we "try" to process the file
+        //
+
+
+
+            try {
+
+                // --------------------------------
+                // create file, and scanner objects
+                // - file object is called tempfilenums.txt and is in your project directory
+                //   that is the same folder as the iml file
+                //
+
+                File userFile = new File(userInputFileName);
+                Scanner scanUserFile = new Scanner(userFile, "UTF-8");
+
+                // ---------------------------------------------
+                // Reads in values from the file in a for loop
+                //
+
+                for(int i=0; i < MAX_DATA; i++) {
+
+                    // ---------------------------------------------
+                    // The scanner checks if there is another integer and prints it
+                    // if there is
+                    //
+
+                    if (scanUserFile.hasNext()) {
+
+                        fileString = scanUserFile.next();
+
+                        for(int i2=0; i2 < MAX_DATA; i2++) {
+
+                            if (arr_[i2][0] != "INVALID"){
+                                if (arr_[i2][0].equalsIgnoreCase(fileString)){
+
+                                    System.out.println(Integer.toString(calcE.encodeMsg(i2)));
+
+                                }
+                            }
+
+                        }
+
+                    }
+                    else {
+                        // ---------------------------------------------
+                        // The scanner detected no other integers
+                        // - closes the scanner for the file
+                        // - breaks out of the for loop
+                        //
+                        System.out.print("\n\nDataFileFILE has been completely READ\n\n");
+                        scanUserFile.close();
+
+                        // A break statement allows us to exit the loop before we have reach the end
+                        break;
+                    }
+                }
+
+
+
+                userOutputFileName = userInputFileName.replace(".txt","_out.txt");
+                File outputFile = new File(userOutputFileName);
+
+                if (outputFile.createNewFile()){
+                    System.out.println(userOutputFileName + " was created"); // if file was created
+                }
+                else {
+                    System.out.println(userOutputFileName + " existed and is being overwritten."); // if file had already existed
+                }
+
+                // --------------------------------
+                // If the file creation of access permissions to write into it
+                // are incorrect the program throws an exception
+                //
+
+                if ((outputFile.isFile()|| outputFile.canWrite())){
+                    BufferedWriter fileOut = new BufferedWriter(new FileWriter(outputFile));
+
+
+                    for(int i=0; i < MAX_DATA; i++) {
+
+                        if (scanUserFile.hasNext()) {
+
+                            for(int i2=0;i2 < arr_.length; i2++) {
+                                if (scanUserFile.next().equalsIgnoreCase(arr_[i2][0])){
+                                    outString = Integer.toString(calcE.encodeMsg(i2));
+                                    fileOut.write(outString + NEWLINE);
+                                }
+                            }
+
+                        }
+                    }
+
+
+                    fileOut.close();
+
+                }
+                else {
+                    throw new IOException();
+                }
+            } // end of try
+
+            // ---------------------------------------------
+            // Catch Statements from the try above
+
+            // ---------------------------------------------
+            // If the file cannot be found then an exception (error) is generated (thrown) that we have to
+            // deal with (catch).
+            //
+            catch (FileNotFoundException e) {
+                System.err.format("File Not Found Exception: %s%n", e);
+                e.printStackTrace();
+            }
+
+            // ---------------------------------------------
+            // If for some reason the output file could not be created we throw an IO Exception
+            //
+            catch (IOException e) { // in case for some reason the output file could not be created
+                System.err.format("IOException: %s%n", e);
+                e.printStackTrace();
+            }
+
+
+
+
+
+
+        }// end main method
 }// end main class
