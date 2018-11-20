@@ -1,12 +1,17 @@
 # Entropy
-
 package com.company;
 
 
 import java.util.*;
 import java.io.*;
+import java.text.DecimalFormat;
 import static com.company.ProjConstants.*;
 public class Main {
+
+
+
+    private static String NEWLINE = System.getProperty("line.separator");
+
 
     public static void main(String[] args) {
         // write your code here
@@ -23,15 +28,15 @@ public class Main {
         // Column [n][3] represents the number of bits required for the message
         // Column [n][4] represents the message identifying number
 
-        String arr_[][] = new String [MAX_DATA][5];
+        String arr_[][] = new String[MAX_DATA][5];
 
 
         // Initialize the array to a known value
         // - loops over each row using "i", and columns using "j"
         // -  sets all array values to INVALID
 
-        for(int i=0; i < MAX_DATA; i++) {
-            for(int j = 0; j < 5; j++){
+        for (int i = 0; i < MAX_DATA; i++) {
+            for (int j = 0; j < 5; j++) {
                 arr_[i][j] = "INVALID";
             }
         }
@@ -39,19 +44,18 @@ public class Main {
 
         // DECLARE VARIABLES
 
-        Boolean replicatedWord=false;
-        int totalFreq=INVALID;
+        Boolean replicatedWord = false;
+        int totalFreq = INVALID;
         String MsgProb;
         int maxBits = INVALID;
         double entropy = INVALID;
         Boolean encodeFile = false;
-        String encodeFileName =  "user_msg_filename.txt";
-        Boolean decodeFile = false;
-        String decodeFileName;
-        Boolean messageFile = false;
-        Boolean noFiles = false;
-        Boolean validWord = false;
-        Boolean fileDone=false;
+        String user_msg_filename = "user_msg_filename.txt";
+        String user_msg_filename_out;
+        String outString;
+
+
+        Boolean fileDone = false;
         try {
             // --------------------------------
             // create file, and scanner objects
@@ -59,14 +63,14 @@ public class Main {
             //   that is the same folder as the iml file
             //
 
-            File userFile = new File(encodeFileName);
+            File userFile = new File(user_msg_filename);
             Scanner scanUserFile = new Scanner(userFile);
 
             // ---------------------------------------------
             // Reads in values from the file in a for loop
             //
 
-            for(int i = 0; i < MAX_DATA; i++) {
+            for (int i = 0; i < MAX_DATA; i++) {
 
 
                 // sets boolean back to false at the start of each repetition
@@ -80,13 +84,13 @@ public class Main {
 
                     // converts string to lower case
 
-                    String fileWord =  scanUserFile.next().toLowerCase();
+                    String fileWord = scanUserFile.next().toLowerCase();
 
 
                     // starting at the current index position 'i', loops backwards over previously stored
                     // strings in the array and checks if the file word is equal to any of the previous values
 
-                    for (int index = i; index >= 0; index --) {
+                    for (int index = i; index >= 0; index--) {
 
                         if (fileWord.equalsIgnoreCase(arr_[index][0])) {
 
@@ -97,10 +101,10 @@ public class Main {
                             int frequency = Integer.parseInt(arr_[index][1]);
 
                             // adds one to the frequency
-                            frequency  += 1 ;
+                            frequency += 1;
 
                             // converts the new frequency back to a string and stores it back into the array
-                            arr_ [index][1] = Integer.toString(frequency);
+                            arr_[index][1] = Integer.toString(frequency);
 
                             replicatedWord = true;
 
@@ -117,20 +121,19 @@ public class Main {
 
                         // stores the word from the file in the next position of the array
 
-                        for (int i2=0; i2< MAX_DATA; i2++){
-                            if (arr_[i2][0].equals("INVALID")){
+                        for (int i2 = 0; i2 < MAX_DATA; i2++) {
+                            if (arr_[i2][0].equals("INVALID")) {
 
-                                arr_ [i2][0] = fileWord;
+                                arr_[i2][0] = fileWord;
 
                                 // the value of 1 will be converted into a string type so that it can be stored in
                                 // the second colomn of the array.
-                                arr_ [i2][1] = Integer.toString(1);
+                                arr_[i2][1] = Integer.toString(1);
                                 break;
                             }
                         }
 
                     }// end for-loop
-
 
 
                 }// end if scanner has next
@@ -169,297 +172,149 @@ public class Main {
             }
 
 
-            // ---------------------------------------------
-            // If the file cannot be found then an exception (error) is generated (thrown) that we have to
-            // deal with (catch).
-            // - we print "e" the exception, and
-            // - show the user where it was using the "exceptions" stack trace information
-            //
+            //------------------------------------------------------------------------
+
+            calcE.calcTotalFreq(arr_);
+
+            calcE.numMsgs(arr_);
+
+            calcE.calcMaxBits();
+
+            for (int i = 0; i < MAX_DATA; i++) {
+                if (arr_[i][1] != "INVALID") {
 
 
+                    calcE.calcMsgProb(arr_[i][1]);
 
-        } catch (FileNotFoundException e) {
-            System.out.println(e);
-            e.printStackTrace();
-        }
+                    arr_[i][2] = Double.toString(calcE.calcMsgProb(arr_[i][1]));
 
-
-
-        //------------------------------------------------------------------------
-        calcE.calcTotalFreq(arr_);
-
-        calcE.numMsgs(arr_);
-
-        calcE.calcMaxBits();
-
-        for (int i = 0; i < MAX_DATA; i++) {
-            if (arr_[i][1] != "INVALID") {
+                    arr_[i][3] = Integer.toString(calcE.calcMsgBits(arr_[i][2]));
 
 
-                calcE.calcMsgProb(arr_[i][1]);
-
-
-                arr_[i][2] =  Double.toString( calcE.calcMsgProb(arr_[i][1]));
-
-
-
-                arr_[i][3] = Integer.toString(calcE.calcMsgBits(arr_[i][2]));
-
-
-
-            }
-        }
-
-
-        calcE.tempArray(arr_);
-
-
-        for (int i=0; i< MAX_DATA; i++){
-
-            if (arr_[i][0]!= "INVALID") {
-
-                arr_[i][4] = Integer.toString(calcE.encodeMsg(i));
-
+                }
             }
 
-        }
 
-        // Display the sorted Matrix
-        for (int i = 0; i < MAX_DATA; i++) {
-            if (arr_[i][0]!= "INVALID") {
-              //  System.out.println(arr_[i][0] + " " +arr_[i][1]  + " " + arr_[i][2] + " " + arr_[i][3] + " " +  arr_[i][4]  );
-
-            }
-
-        }
+            calcE.tempArray(arr_);
 
 
+            for (int i = 0; i < MAX_DATA; i++) {
 
+                if (arr_[i][0] != "INVALID") {
 
-
-
-        // <user_msg_filename>.txt
-
-
-        //  <user_msg_filename>_out.txt
-
-        System.out.println("==========================================================================================");
-        System.out.println("                       Data Result File \n");
-
-        System.out.println("\tData File:............\t\t\t " + encodeFileName );
-        System.out.printf("\tNumber of Messages:....\t%10s\n" , Integer.toString(calcE.numMsgs(arr_)));
-        System.out.printf("\tMax Number of Bits.....\t%10s\n" , Integer.toString(calcE.calcMaxBits()));
-        System.out.printf("\tEntropy:...............\t%13.2f\n", calcE.calcEntropy(arr_));
-        System.out.println("\n            Message          Frequency         # of bits       Probability ");
-        System.out.println("           ------------------------------------------------------------------\n");
-
-        for (int i=0; i< MAX_DATA; i ++){
-            if (arr_[i][0]!="INVALID") {
-                System.out.printf("\t\t %10s      %10s      %10s         %10.2f\n", arr_[i][0], arr_[i][1],arr_[i][3], Double.parseDouble(arr_[i][2]));
-
-            }
-        }
-
-        System.out.println("\n           ------------------------------------------------------------------\n");
-        System.out.println("\n==========================================================================================\n");
-
-        /*
-        You must display the required data to screen, and also write it into a file as well (name the file <user_msg_filename>_out.txt
-
-
-
-
-...
-========================================
-Data File: <user_msg_filename>.txt
-Data Result File: <user_msg_filename>_out.txt
-
-------------------------------
-Number of Messages: <some integer value>
-Max Number of Bits: <some integer value>
-Entropy: <some decimal value showing only 2 decimal places>
-
-Message	Frequency	# of bits	Probability
-------------	--------------	----------	--------------
-<msg 1>	<int>		<int>		<double with 2 decimal places>
-<msg 2>	<int>		<int>		<double with 2 decimal places>
-…
-<msg N>	<int>		<int>		<double with 2 decimal places>
-
-------------------------------
-Please enter the name of the message data file to be encoded:
-<msg_data>.txt
-** the above is to be done by the encode object and stored in the <msg_data>_EC.txt**
-Message Data Encoded into: <msg_data>_EC.txt
-
-Decoding <msg_data>_EC.txt into <msg_data>_DC.txt
-** the above is to be done by the decode object and stored in the <msg_data>_DC.txt**
-Display File Data: 
-
-Original Data		Encoded Data		Decoded Data
------------------		-------------------		--------------------
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-…
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-** the above is to be done reading all 3 files line by line simultaneously and displaying the values to the screen. This should be done using the displayFinalData method in the main class**
-========================================
-
-         */
-
-
-
-
-
-
-
-
-    }// end main method
-}// end main class
-
-
-
-        for (int i=0; i< MAX_DATA; i++){
-
-            if (arr_[i][0]!= "INVALID") {
-
-                arr_[i][4] = Integer.toString(calcE.encodeMsg(i));
-
-            }
-
-        }
-
-        // Display the sorted Matrix
-        for (int i = 0; i < MAX_DATA; i++) {
-                if (arr_[i][0]!= "INVALID") {
-                    System.out.println(arr_[i][0] + " " +arr_[i][1]  + " " + arr_[i][2] + " " + arr_[i][3] + " " +  arr_[i][4]  );
+                    arr_[i][4] = Integer.toString(calcE.encodeMsg(i));
 
                 }
 
-        }
-
-
-
-
-
-        /*
-         int temp_int_arr [][] = new int [MAX_DATA][3];
-
-        // Initialize the array to a known value
-        // - loops over each row using "i", and columns using "j"
-        // -  sets all array values to INVALID
-
-
-
-        for(int i=0; i < MAX_DATA; i++) {
-            for(int j = 0; j < 2; j++){
-                temp_int_arr[i][j] = INVALID;
             }
-        }
 
+            // Display the sorted Matrix
+            for (int i = 0; i < MAX_DATA; i++) {
+                if (arr_[i][0] != "INVALID") {
+                    //  System.out.println(arr_[i][0] + " " +arr_[i][1]  + " " + arr_[i][2] + " " + arr_[i][3] + " " +  arr_[i][4]  );
 
-        for(int i=0; i < MAX_DATA; i++) {
-            if (arr_[i][0]!= "INVALID") {
-                temp_int_arr[i][0] = i;
-                temp_int_arr[i][1] = Integer.parseInt(arr_[i][1]);
-                System.out.println(temp_int_arr[i][0] + " " + temp_int_arr[i][1]);
-
+                }
 
             }
 
-        }
 
 
-        calcE.sortbyColumn(temp_int_arr, 1);
+            System.out.println("==========================================================================================");
+            System.out.println("                       Data Result File \n");
 
+            System.out.println("\tData File:............\t\t\t " + user_msg_filename);
+            System.out.printf("\tNumber of Messages:....\t%10s\n", Integer.toString(calcE.numMsgs(arr_)));
+            System.out.printf("\tMax Number of Bits.....\t%10s\n", Integer.toString(calcE.calcMaxBits()));
+            System.out.printf("\tEntropy:...............\t%13.2f\n", calcE.calcEntropy(arr_));
+            System.out.println("\n            Message          Frequency         # of bits       Probability ");
+            System.out.println("           ------------------------------------------------------------------\n");
 
-        System.out.println(" ----------------     After        ---------------------  \n");
+            for (int i = 0; i < MAX_DATA; i++) {
+                if (arr_[i][0] != "INVALID") {
+                    System.out.printf("\t\t %10s      %10s      %10s         %10.2f\n", arr_[i][0], arr_[i][1], arr_[i][3], Double.parseDouble(arr_[i][2]));
 
-        for(int i=0; i < MAX_DATA; i++) {
-
-            if (temp_int_arr[i][0]!= INVALID) {
-
-                temp_int_arr[i][2] = i;
-
-                System.out.println(temp_int_arr[i][0] + " " + temp_int_arr[i][1] + " " + temp_int_arr[i][2]);
-
-                arr_[temp_int_arr[i][0]][4] = Integer.toString(temp_int_arr[i][2]);
-
-
-
+                }
             }
 
+            System.out.println("\n           ------------------------------------------------------------------\n");
+            System.out.println("\n==========================================================================================\n");
+
+
+            user_msg_filename_out = user_msg_filename.replace(".txt", "_out.txt");
+            File outputFile = new File(user_msg_filename_out);
+
+
+            if (outputFile.createNewFile()){
+                System.out.println(user_msg_filename_out + " was created"); // if file was created
+            }
+            else {
+                System.out.println(user_msg_filename_out + " existed and is being overwritten."); // if file had already existed
+            }
+
+            // --------------------------------
+            // If the file creation of access permissions to write into it
+            // are incorrect the program throws an exception
+            //
+
+            if ((outputFile.isFile()|| outputFile.canWrite())){
+                BufferedWriter fileOut = new BufferedWriter(new FileWriter(outputFile));
+
+                DecimalFormat numberFormat = new DecimalFormat("0.00");
+
+
+                fileOut.write("==========================================================================================");
+                fileOut.write("                       Data Result File " + NEWLINE);
+
+                outString = NEWLINE + "\t\tData File.............. \t\t" +  user_msg_filename + NEWLINE;
+                fileOut.write(outString);
+                outString = "\t\tNumber of Messages:.... \t\t" + Integer.toString(calcE.numMsgs(arr_)) +  NEWLINE;
+                fileOut.write(outString);
+                outString = "\t\tMaxNumber of Bits:.....  \t\t" + Integer.toString(calcE.calcMaxBits()) + NEWLINE;
+                fileOut.write(outString);
+                outString = "\t\tEntropy:...............   \t\t" + numberFormat.format(calcE.calcEntropy(arr_))+  NEWLINE + NEWLINE;
+                fileOut.write(outString);
+                fileOut.write (NEWLINE + "            Message          Frequency         # of bits       Probability " + NEWLINE) ;
+                fileOut.write("       --------------------------------------------------------------------------" + NEWLINE);
+
+                for (int i = 0; i < MAX_DATA; i++) {
+                    if (arr_[i][0] != "INVALID") {
+
+                        outString = "\t\t\t" + arr_[i][0] + "\t\t\t\t" + arr_[i][1] +  "\t\t\t\t   " + arr_[i][3] + "\t\t\t\t" + (numberFormat.format(Double.parseDouble(arr_[i][2])));
+                        fileOut.write(NEWLINE + outString);
+                    }
+                }
+
+
+                fileOut.write(NEWLINE + NEWLINE + "==========================================================================================");
+
+                fileOut.close();
+
+            }
+            else {
+                throw new IOException();
+            }
+
+        } // end of try
+
+        // ---------------------------------------------
+        // Catch Statements from the try above
+
+        // ---------------------------------------------
+        // If the file cannot be found then an exception (error) is generated (thrown) that we have to
+        // deal with (catch).
+        //
+        catch (FileNotFoundException e) {
+            System.err.format("File Not Found Exception: %s%n", e);
+            e.printStackTrace();
         }
-         */
 
-
-
-
-        System.out.println("==============================================");
-
-       // <user_msg_filename>.txt
-        System.out.println("Data File: " + encodeFileName );
-
-       //  <user_msg_filename>_out.txt
-        System.out.println("Data Result File: " + "\n\n");
-        System.out.println("------------------------------------------");
-
-        System.out.println("Number of Messages: " + calcE.numMsgs(arr_));
-
-        System.out.println("Max Number of Bits: " + calcE.calcMaxBits());
-
-        System.out.println("Entropy: " );
-
-        /*
-        You must display the required data to screen, and also write it into a file as well (name the file <user_msg_filename>_out.txt
-
-
-
-
-
-...
-========================================
-Data File: <user_msg_filename>.txt
-Data Result File: <user_msg_filename>_out.txt
-
-------------------------------
-Number of Messages: <some integer value>
-Max Number of Bits: <some integer value>
-Entropy: <some decimal value showing only 2 decimal places>
-
-Message	Frequency	# of bits	Probability
-------------	--------------	----------	--------------
-<msg 1>	<int>		<int>		<double with 2 decimal places>
-<msg 2>	<int>		<int>		<double with 2 decimal places>
-…
-<msg N>	<int>		<int>		<double with 2 decimal places>
-
-------------------------------
-Please enter the name of the message data file to be encoded:
-<msg_data>.txt
-** the above is to be done by the encode object and stored in the <msg_data>_EC.txt**
-Message Data Encoded into: <msg_data>_EC.txt
-
-Decoding <msg_data>_EC.txt into <msg_data>_DC.txt
-** the above is to be done by the decode object and stored in the <msg_data>_DC.txt**
-Display File Data:
-
-Original Data		Encoded Data		Decoded Data
------------------		-------------------		--------------------
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-…
-<msg_data>		<msg_data>_EC	<msg_data>_DC
-** the above is to be done reading all 3 files line by line simultaneously and displaying the values to the screen. This should be done using the displayFinalData method in the main class**
-========================================
-
-         */
-
-
-
-
+        // ---------------------------------------------
+        // If for some reason the output file could not be created we throw an IO Exception
+        //
+        catch (IOException e) { // in case for some reason the output file could not be created
+            System.err.format("IOException: %s%n", e);
+            e.printStackTrace();
+        }
 
 
 
