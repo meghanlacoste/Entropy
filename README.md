@@ -1,6 +1,5 @@
 # Entropy
 
-
 package com.company;
 
 import java.util.*;
@@ -22,27 +21,39 @@ public class Entropy {
     private double msgProb =  INVALID;
     private double entropy = INVALID;
     private int  msgBits = INVALID;
-    private int  msgEncode = 0;
+    private int  msgEncode = INVALID_ENCODE;
     private int  temp_int_arr [][] = new int [MAX_DATA][3];
     private String decodeMsg = "INVALID_DECODE";
-
-
-    public  Entropy (int x){
-
-        //case statement
-
-        if (x == ENCODE){
+    private boolean encode = false;
+    private boolean decode = false;
 
 
 
 
+    //parameterized constructor that takes in one integer parameter
 
+    public  Entropy (int inputMode){
 
-        } else if (x==DECODE){
+        switch (inputMode) {
+            case ENCODE: {
+
+                encode = true;
+                decode = false;
+            }
+
+            case DECODE: {
+                decode = true;
+                encode = false;
+            }
+            default:{
+
+                decode = true;
+                encode = true;
+            }
+
 
 
         }
-
 
     }
 
@@ -73,6 +84,8 @@ public class Entropy {
 
             }
         });  // End of function call sort().
+
+
     }
 
 
@@ -82,28 +95,46 @@ public class Entropy {
     public int calcTotalFreq(String array[][]){
 
         for (int i=0; i < MAX_DATA; i++) {
+
             if (array[i][1] != "INVALID") {
+
                 int freq = Integer.parseInt(array[i][1]);
                 totalFreq += freq;
+
 
             }
         }
 
+
+
         return totalFreq;
     }
 
+    //pre-conditions:
+    //      - must have at least one item stored in the array (the total frequency must be valid)
+    // returns the number of unique messages stored in the array by adding
+    //one to the counter until it reaches the point where no more valid words
+    // are stored in the first column of the String array
 
-    // returns the number of unique messages stored in the array
+
     public int numMsgs (String array [][]) {
         if (totalFreq != 0) {
+
             numMsgs = 0;
+
             for (int i = 0; i < MAX_DATA; i++) {
+
                 if (array[i][0] != "INVALID") {
+
                     numMsgs += 1;
+
                 }
 
 
             }
+        } else {
+
+            System.out.print("INVALID NUMBER OF MESSAGES");
         }
 
         return numMsgs;
@@ -111,16 +142,27 @@ public class Entropy {
 
 
 
+    ////pre-conditions:
+    //   - must have at least one item stored in the array (the number of messages must be valid)
     //
+    // returns an integer value representing the max number of bits required by taking the log base 2
+    // of the number of unique messages
+
+
+
     public int calcMaxBits (){
 
         if (numMsgs != INVALID_MSGS ) {
+
             double double_maxBits = 0;
             double_maxBits = (Math.log(numMsgs)) / Math.log(2);
 
-            // rounds up always to nearest integer
+            // rounds UP to nearest integer
             maxBits = (int) Math.ceil(double_maxBits);
 
+        } else {
+
+            System.out.print("INVALID NUMBER OF MESSAGES");
         }
 
         return maxBits;
@@ -131,7 +173,8 @@ public class Entropy {
 
         if(totalFreq!=0) {
 
-
+            // the probability is calcuted by dividing the frequency of the message
+            //by the total number of data items in the array
             msgProb = (double) Integer.parseInt(MsgFreq)/totalFreq;
 
 
@@ -149,10 +192,13 @@ public class Entropy {
 
     public int calcMsgBits(String string_msgProb) {
 
+        // calculates the message bits required using the message probability
+
         double msgProb =  Double.parseDouble(string_msgProb);
 
         double double_msgBits = - ((Math.log(msgProb)) / Math.log(2));
 
+        // rounds up to the nearest whole number
         msgBits = (int)Math.ceil(double_msgBits);
 
         return msgBits;
@@ -176,11 +222,19 @@ public class Entropy {
         }
 
 
+        // the index position of the String array 'i' is stored in the first column of the temporary array
+        // the frequency of the word in the row 'i' is stored in the second column of the temporary array
+
         for(int i=0; i < MAX_DATA; i++) {
+
+            // excecutes as long as there is a string stored in that row position of the String array
+            // (not the default "INVALID")
+
             if (arr_[i][0]!= "INVALID") {
+
                 temp_int_arr[i][0] = i;
                 temp_int_arr[i][1] = Integer.parseInt(arr_[i][1]);
-                // System.out.println(temp_int_arr[i][0] + " " + temp_int_arr[i][1]);
+
 
 
             }
@@ -189,7 +243,6 @@ public class Entropy {
 
 
         sortbyColumn(temp_int_arr, 1);
-
 
 
 
@@ -210,11 +263,25 @@ public class Entropy {
 
     public int encodeMsg (int index) {
 
-        for (int i = 0; i < MAX_DATA; i++) {
+        //pre-condition:
+        // - the constructor cannot be given a decode argument (the decode object cannot encode)
+        // - will set to INVALID_ENCODE if the this condition not met
 
-            if (index == temp_int_arr[i][0]){
-                msgEncode = temp_int_arr[i][2];
+        if (encode) {
 
+            for (int i = 0; i < MAX_DATA; i++) {
+
+                // if the index position of the word matches the value stored in
+                // the first column of the temporary array, the message number
+                // is set to the value stored in the third column of the temporary array
+
+                if (index == temp_int_arr[i][0]) {
+
+
+                    msgEncode = temp_int_arr[i][2];
+
+
+                }
             }
         }
 
@@ -222,14 +289,32 @@ public class Entropy {
         return msgEncode;
     }
 
+
     public String decodeMsg (String arr_[][] , int encodeNumb) {
 
-        for (int i = 0; i < MAX_DATA; i++) {
-            if ( temp_int_arr [i][2] == encodeNumb){
+        //pre-condition:
+        // - the constructor cannot be given an encode argument (the encode object cannot decode)
+        // - will set to INVALID_DECODE if the this condition not met
 
-                decodeMsg = arr_[temp_int_arr[i][0]][0];
+       if (decode) {
+
+
+            for (int i = 0; i < MAX_DATA; i++) {
+
+                // pre-conditions: - the value of the index cannot be invalid
+                // - the message number given must equal the message number stored in the temporary array
+
+                if ((temp_int_arr [i][0]!= INVALID) && (encodeNumb == temp_int_arr [i][2])){
+
+                    //returns the original word stored in the string array as it's index position
+                    // is stored in the first column of the temporary array
+                    decodeMsg = arr_[temp_int_arr[i][0]][0];
+                }
+
             }
+
         }
+
 
         return decodeMsg;
     }
@@ -238,15 +323,20 @@ public class Entropy {
 
 
     public double calcEntropy (String arr_ [][]) {
-        entropy=0;
-        double message_prob = 0;
-        int message_bits = 0;
+
+        entropy = 0;
+
+        double message_prob;
+
+        int message_bits;
+
+        // finds the sum of the products of each word's probability and it's corresponding number of bits
 
         for (int i = 0; i < MAX_DATA; i++) {
 
             if (arr_[i][0] != "INVALID"){
 
-                message_prob= Double.parseDouble(arr_[i][2]);
+                message_prob = Double.parseDouble(arr_[i][2]);
 
                 message_bits = Integer.parseInt(arr_[i][3]);
 
